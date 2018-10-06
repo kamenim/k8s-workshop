@@ -86,7 +86,7 @@ service:
 
   ## App service port
   ##
-  externalPort: 80
+  externalPort: 8080
 
   ## Pod exposed port
   ##
