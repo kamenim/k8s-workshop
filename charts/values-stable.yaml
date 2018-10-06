@@ -90,7 +90,7 @@ service:
 
   ## Pod exposed port
   ##
-  internalPort: 8080
+  internalPort: 3000
 
 ## Resource requests and limits
 ## Ref: http://kubernetes.io/docs/user-guide/compute-resources/
