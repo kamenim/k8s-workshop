@@ -1,14 +1,22 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/kamenim/k8s-workshop/internal/diagnostics"
 )
+
+type serverConf struct {
+	port   string
+	router http.Handler
+	name   string
+}
 
 func main() {
 	log.Print("Simple hello")
@@ -27,34 +35,44 @@ func main() {
 
 	possibleErrors := make(chan error, 2)
 
-	go func() {
-		server := &http.Server{
-			Addr:    ":" + srvPort,
-			Handler: router,
-		}
-		err := server.ListenAndServe()
-		if err != nil {
-			possibleErrors <- err
-		}
-	}()
+	configurations := []serverConf{
+		{
+			port:   srvPort,
+			router: router,
+			name:   "application server",
+		},
+		{
+			port:   diagPort,
+			router: diagnostics.NewDiagnostics(),
+			name:   "Diag server",
+		},
+	}
 
-	go func() {
-		diagnostics := diagnostics.NewDiagnostics()
-		diagServer := &http.Server{
-			Addr:    ":" + diagPort,
-			Handler: diagnostics,
-		}
-		err := diagServer.ListenAndServe()
-		// err := http.ListenAndServe(":"+diagPort, diagnostics)
-		if err != nil {
-			// log.Fatal(err)
-			possibleErrors <- err
-		}
-	}()
+	servers := make([]*http.Server, 2)
+
+	for i, c := range configurations {
+		go func(conf serverConf, i int) {
+			log.Printf("Starting server %s", conf.name)
+			servers[i] = &http.Server{
+				Addr:    ":" + conf.port,
+				Handler: conf.router,
+			}
+			err := servers[i].ListenAndServe()
+			if err != nil {
+				possibleErrors <- err
+			}
+		}(c, i)
+	}
 
 	// block on channel
 	select {
 	case err := <-possibleErrors:
+		for _, s := range servers {
+			// propose PR with context timeout
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			s.Shutdown(ctx)
+		}
 		log.Fatal(err)
 	}
 }
