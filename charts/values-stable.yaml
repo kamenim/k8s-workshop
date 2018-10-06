@@ -35,7 +35,7 @@ image:
   ## Docker Registry/Hub image name and tag
   ##
   registry: docker.io/webdeva
-  name: go-sofia
+  name: k8s-workshop
   tag: 0.0.1
 
   ## Docker Registry/Hub image pull policy
@@ -77,7 +77,7 @@ ingress:
 service:
   ## App container name
   ##
-  name: go-sofia
+  name: k8s-workshop
   
   ## Service Type
   ## For minikube, set this to NodePort, elsewhere use ClusterIP

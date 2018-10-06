@@ -2,9 +2,9 @@
 GOOS?=linux
 GOARCH?=amd64
 
-PROJECT?=github.com/rumyantseva/go-sofia
-BUILD_PATH?=cmd/go-sofia
-APP?=go-sofia
+PROJECT?=github.com/kamenim/k8s-workshop
+BUILD_PATH?=cmd/k8s-workshop
+APP?=k8s-workshop
 
 PORT?=8000
 DIAG_PORT?=3001

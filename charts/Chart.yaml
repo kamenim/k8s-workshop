@@ -1,4 +1,4 @@
-name: go-sofia
+name: k8s-workshop
 description: A Helm charts for Kubernetes application
 version: 0.0.1
 home: https://k8s.community/
